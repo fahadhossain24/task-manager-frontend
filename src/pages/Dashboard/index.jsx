@@ -19,7 +19,7 @@ const Dashboard = () => {
         },
     ]
     return (
-        <div className="w-[80%] h-[100vh] mx-auto mr-10">
+        <div className="w-[80%] h-[100vh] mx-auto ">
             <div className="flex sm:flex-col lg:flex-row justify-evenly gap-2 mx-auto mt-5">
                 {
                     tasks.map((item, index) => (

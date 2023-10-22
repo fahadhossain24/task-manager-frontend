@@ -3,7 +3,7 @@ import { Icon } from "@iconify/react";
 
 const Completed = () => {
     return (
-        <div className="w-[80%] mx-auto mr-0 h-[100vh] mt-2">
+        <div className="w-[80%] mx-auto h-[100vh] mt-2">
 
             <div className="flex sm:flex-col lg:flex-row sm:ml-20 lg:ml-0 sm:gap-2 lg: gap-0 justify-between py-2">
                 <h2 className="text-2xl font-bold text-blue-900">Completed Task</h2>

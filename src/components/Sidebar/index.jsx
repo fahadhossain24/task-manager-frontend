@@ -40,7 +40,7 @@ const Sidebar = () => {
 
 
     return (
-        <div className={`h-full fixed bg-blue-200 text-blue-900 ${isMenuOpen ? 'w-[200px]' : 'w-[50px]'}`}>
+        <div className={` h-[100vh] bg-blue-200 text-blue-900 ${isMenuOpen ? 'w-[200px]' : 'w-[50px]'}`}>
             <div className='flex items-center justify-between text-2xl font-bold mb-5 border-b-[1px] border-blue-500 p-3'>
                 <h2 className={`cursor-pointer ${isMenuOpen ? 'block' : 'hidden'}`}>Task</h2>
                 <Icon

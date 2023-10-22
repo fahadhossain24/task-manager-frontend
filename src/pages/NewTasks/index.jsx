@@ -2,12 +2,39 @@ import SearchBar from "../../components/SearchBar";
 import Button from "../../components/Button";
 import Card from "../../components/Card";
 import { Icon } from "@iconify/react";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { useState } from "react";
 
 const NewTasks = () => {
-    return (
-        <div className="w-[80%] mx-auto mr-0 h-[100vh] mt-2">
+    const [page, setpage] = useState(1);
+    const [activePage, setActivePage] = useState(0);
 
-            <div className="flex sm:flex-col lg:flex-row sm:ml-20 lg:ml-0 sm:gap-2 lg: gap-0 justify-between py-2">
+    const limit = 9;
+
+    const getTasks = async () => {
+        try {
+            const response = await axios.get(`http://localhost:4000/api/v1/task?page=${page}&limit=${limit}`);
+            return response?.data?.data
+        } catch (error) {
+            throw error.message;
+        }
+    }
+    const { data, isLoading, error } = useQuery({ queryKey: ['tasks', page, limit], queryFn: getTasks })
+
+    let pages = [];
+    for (let i = 0; i < data?.totalPages; i++) {
+        pages.push(i);
+    }
+
+    if (isLoading) {
+        return <p>Loading...</p>
+    }
+
+    return (
+        <div className="w-[80%] mx-auto  mt-2">
+
+            <div className="flex sm:flex-col lg:flex-row sm:ml-20 lg:ml-0 sm:gap-2 lg:gap-0 justify-between py-2">
                 <h2 className="text-2xl font-bold text-blue-900">New Tasks</h2>
                 <div className="pr-8">
                     <SearchBar placeholder='Task search' />
@@ -15,64 +42,40 @@ const NewTasks = () => {
                 </div>
             </div>
 
-            <div className="flex flex-wrap lg:flex-row sm:flex-col sm:mx-auto sm:ml-20 lg:ml-0 sm:gap-2 justify-start lg:mr-6 mt-2">
-                <Card cardInfo={{
-                    title: 'task title',
-                    status: 'new',
-                    description: 'task description',
-                    customStyle: 'lg:w-[32%] sm:w-[75%] '
-                }} >
-                    <div className="flex justify-between items-center">
-                        <div className="flex gap-1 items-center">
-                        <p>{new Date().toLocaleDateString()}</p>
-                        <Icon icon="line-md:edit-twotone" className="cursor-pointer"/>
-                        <Icon icon="ic:baseline-delete" className="cursor-pointer"/>
-                        </div>
-                        <div className="flex gap-1">
-                        <p className="bg-blue-400 text-white px-2 text-sm">Weekly</p>
-                        <p className="bg-blue-400 text-white px-2 text-sm">High</p>
-                        <p className="bg-blue-400 text-white px-2 text-sm">Private</p>
-                        </div>
-                    </div>
-                </Card>
-                <Card cardInfo={{
-                    title: 'task title',
-                    status: 'new',
-                    description: 'task description',
-                    customStyle: 'lg:w-[32%] sm:w-[75%] '
-                }} >
-                    <div className="flex justify-between items-center">
-                        <div className="flex gap-1 items-center">
-                        <p>{new Date().toLocaleDateString()}</p>
-                        <Icon icon="line-md:edit-twotone" className="cursor-pointer"/>
-                        <Icon icon="ic:baseline-delete" className="cursor-pointer"/>
-                        </div>
-                        <div className="flex gap-1">
-                        <p className="bg-blue-400 text-white px-2 text-sm">Dealy</p>
-                        <p className="bg-blue-400 text-white px-2 text-sm">low</p>
-                        <p className="bg-blue-400 text-white px-2 text-sm">Team</p>
-                        </div>
-                    </div>
-                </Card>
-                <Card cardInfo={{
-                    title: 'task title',
-                    status: 'new',
-                    description: 'task description',
-                    customStyle: 'lg:w-[32%] sm:w-[75%] '
-                }} >
-                    <div className="flex justify-between items-center">
-                        <div className="flex gap-1 items-center">
-                        <p>{new Date().toLocaleDateString()}</p>
-                        <Icon icon="line-md:edit-twotone" className="cursor-pointer"/>
-                        <Icon icon="ic:baseline-delete" className="cursor-pointer"/>
-                        </div>
-                        <div className="flex gap-1">
-                        <p className="bg-blue-400 text-white px-2 text-sm">Monthly</p>
-                        <p className="bg-blue-400 text-white px-2 text-sm">low</p>
-                        <p className="bg-blue-400 text-white px-2 text-sm">Private</p>
-                        </div>
-                    </div>
-                </Card>
+            <div className="flex flex-wrap lg:flex-row sm:flex-col sm:mx-auto sm:ml-20 lg:ml-0 sm:gap-2 lg:gap-5 justify-start lg:mr-6 mt-2">
+                {
+                    data?.tasks.map((task, index) => (
+                        <Card key={index} cardInfo={{
+                            title: task.taskName,
+                            status: task.taskStatus,
+                            description: task.description,
+                            customStyle: 'lg:w-[32%] sm:w-[75%] '
+                        }} >
+                            <div className="flex justify-between items-center">
+                                <div className="flex gap-1 items-center">
+                                    <p>{task.deadline.split('T')[0]}</p>
+                                    <Icon icon="line-md:edit-twotone" className="cursor-pointer" />
+                                    <Icon icon="ic:baseline-delete" className="cursor-pointer" />
+                                </div>
+                                <div className="flex gap-1">
+                                    <p className="bg-blue-400 text-white px-2 text-sm">{task.taskRecurring}</p>
+                                    <p className="bg-blue-400 text-white px-2 text-sm">{task.priority}</p>
+                                    <p className="bg-blue-400 text-white px-2 text-sm">{task.taskVisibility}</p>
+                                </div>
+                            </div>
+                        </Card>
+                    ))
+                }
+            </div>
+            <div className="flex justify-center gap-2 mt-4">
+                {
+                    pages.map((page) => (
+                        <button key={page} onClick={() => {
+                            setpage(page + 1);
+                            setActivePage(page);
+                        }} className={`border-2 border-blue-600 px-2 ${activePage === page ? 'bg-blue-400' : ''}`}>{page + 1}</button>
+                    ))
+                }
             </div>
         </div>
     );
