@@ -9,6 +9,8 @@ import Canceled from '../pages/Canceled';
 import NotFound from "../pages/NotFound";
 import Login from "../pages/Login";
 import Registration from "../pages/Registration";
+import PrivateRoute from "./privateRoute";
+
 
 
 const routes = createBrowserRouter([
@@ -26,23 +28,23 @@ const routes = createBrowserRouter([
             },
             {
                 path: '/create-new',
-                element: <CreateNew/>
+                element: <PrivateRoute><CreateNew/></PrivateRoute>
             },
             {
                 path: '/new-tasks',
-                element: <NewTasks/>
+                element: <PrivateRoute><NewTasks/></PrivateRoute>
             },
             {
                 path: '/in-progress',
-                element: <InProgress/>
+                element: <PrivateRoute><InProgress/></PrivateRoute>
             },
             {
                 path: '/completed',
-                element: <Completed/>
+                element: <PrivateRoute><Completed/></PrivateRoute>
             },
             {
                 path: '/canceled',
-                element: <Canceled/>
+                element: <PrivateRoute><Canceled/></PrivateRoute>
             }
         ]
     },

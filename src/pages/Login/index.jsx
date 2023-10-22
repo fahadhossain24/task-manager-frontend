@@ -3,20 +3,85 @@ import loginImg from '../../../images/login.png'
 import UserInput from '../../components/UserInput';
 import Button from '../../components/Button';
 import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { signup, login } from '../../utils/Auth/Auth';
+import Modal from '../../components/Modal';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-    const [login, setLogin] = useState(true);
-    const [registration, setRegistration] = useState(false);
-    const { handleSubmit, register, formState, reset} = useForm();
+    const [isLoginForm, setIsLoginForm] = useState(true);
+    const [isRegistrationForm, setIsRegistrationForm] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [signupError, setSignUpError] = useState('');
+    const [loginError, setLoginError] = useState('');
+    const navigate = useNavigate()
+    const { handleSubmit, register, formState } = useForm();
+
+    // signup and login handler using useMutation from tanstack query
+    const { mutateAsync, isPending, reset } = useMutation({ mutationFn: signup })
+    const handleLogin = useMutation({ mutationFn: login })
+
+    // show modal when isModalOpen is true
+    isModalOpen && window.document.getElementById('sign_up_modal')?.showModal();
 
 
-    const onSubmit = (data) => {
-        console.log(data)
+    // signup and login form sumbit handler
+    const onSubmit = async (data) => {
+        try {
+            if (isRegistrationForm) {
+                const response = await mutateAsync(data)
 
-        reset()
+                if (response.status === 'success') {
+                    setSignUpError('')
+                    setIsRegistrationForm(false)
+                    setIsModalOpen(true);
+                } else {
+                    setSignUpError(response?.response?.data?.error)
+                    setIsModalOpen(true);
+                }
+                
+            }
+            if (isLoginForm) {
+                const { firstName, lastName, ...loginInfo } = data;
+                const response = await handleLogin.mutateAsync(loginInfo);
+                if (response.status === 'success') {
+                    setLoginError('');
+                    navigate('/')
+                } else {
+                    setLoginError(response?.response?.data?.error);
+                    setIsModalOpen(true);
+                }
+            }
+
+        } catch (error) {
+            // console.log(error)
+            throw new Error(error.message)
+            // console.log(error.message)
+            // setUserError(error.message)
+            // setIsModalOpen(true)
+        }
     }
 
+
+    // console.log(isModalOpen)
+
+    if (isPending || handleLogin.isPending) {
+        return <p className='h-[100vh]'>Loading...</p>
+    }
+
+    // console.log(loginError)
+
+    // modal body
+    const modalBody = signupError
+        ? signupError.split(' ')[0] === 'E11000'
+            ? 'Oops, failed. Email is already in use.'
+            : signupError
+        : loginError
+            ? loginError
+            : `Congratulations! ${isLoginForm ? 'Login successful' : `Sign up successful. Please check your email and verify that`}.`;
+
     return (
+
         <div className="h-[100vh] w-[80%] mx-auto flex items-center justify-center">
             <div className='w-[50%] sm:hidden lg:block'>
                 <img src={loginImg} alt="" className='w-[100%] mx-auto' />
@@ -25,19 +90,29 @@ const Login = () => {
                 <h2
                     className='xl:w-[50%] sm:w-full lg:w-[70%] mx-auto flex justify-evenly text-xl py-1 rounded-full border-2 border-blue-500 font-semibold'
                 >
-                    <span onClick={() => {setLogin(true); setRegistration(false)}} className={`border-[1px] border-blue-600 px-3 rounded-full hover:bg-blue-400 hover:text-white cursor-pointer ${login ? 'bg-blue-400 text-white' : ''}`}>Login</span>{" "}
-                    <span onClick={() => {setLogin(false); setRegistration(true)}} className={`border-[1px] border-blue-600 px-3 rounded-full hover:bg-blue-400 hover:text-white cursor-pointer ${registration ? 'bg-blue-400 text-white' : ''}`}>Sign Up</span>
+                    <span onClick={() => { setIsLoginForm(true); setIsRegistrationForm(false) }} className={`border-[1px] border-blue-600 px-3 rounded-full hover:bg-blue-400 hover:text-white cursor-pointer ${isLoginForm ? 'bg-blue-400 text-white' : ''}`}>Login</span>{" "}
+                    <span onClick={() => { setIsLoginForm(false); setIsRegistrationForm(true) }} className={`border-[1px] border-blue-600 px-3 rounded-full hover:bg-blue-400 hover:text-white cursor-pointer ${isRegistrationForm ? 'bg-blue-400 text-white' : ''}`}>Sign Up</span>
                 </h2>
                 <form onSubmit={handleSubmit(onSubmit)}>
-                    {registration && <UserInput
-                        label="User Name"
-                        name="name"
+                    {isRegistrationForm && <UserInput
+                        label="First Name"
+                        name="firstName"
                         inputType="text"
                         // defaultValue={name}
                         required="required"
                         register={register}
                         formState={formState}
-                        customInputStyle= 'w-full'
+                        customInputStyle='w-full'
+                    />}
+                    {isRegistrationForm && <UserInput
+                        label="Last Name"
+                        name="lastName"
+                        inputType="text"
+                        // defaultValue={name}
+                        required="required"
+                        register={register}
+                        formState={formState}
+                        customInputStyle='w-full'
                     />}
                     <UserInput
                         label="User Email"
@@ -47,7 +122,7 @@ const Login = () => {
                         required="required"
                         register={register}
                         formState={formState}
-                        customInputStyle= 'w-full'
+                        customInputStyle='w-full'
                     />
                     <UserInput
                         label="Password"
@@ -57,22 +132,34 @@ const Login = () => {
                         required="required"
                         register={register}
                         formState={formState}
-                        customInputStyle= 'w-full'
+                        customInputStyle='w-full'
                     />
-                    {registration && <UserInput
+                    {isRegistrationForm && <UserInput
                         label="Confirm Password"
-                        name="password"
+                        name="confirmPassword"
                         inputType="password"
                         // defaultValue={name}
                         required="required"
                         register={register}
                         formState={formState}
-                        customInputStyle= 'w-full'
+                        customInputStyle='w-full'
                     />}
-                    <Button buttonText={`${!registration? 'Login' : 'Sign Up'}`} customStyle='px-3 bg-blue-300 w-full mt-3 hover:bg-blue-500' />
+                    <Button buttonText={`${!isRegistrationForm ? 'Login' : 'Sign Up'}`} customStyle='px-3 bg-blue-300 w-full mt-3 hover:bg-blue-500' />
                 </form>
             </div>
+
+            {/* configure modal */}
+            <Modal
+                id='sign_up_modal'
+                icon={`${!signupError && !loginError ? 'flat-color-icons:ok' : 'material-symbols:error'}`}
+                body={modalBody}
+                bodyCustomStyle='text-xl text-center text-blue-900 font-semibold'
+                btnText='Ok'
+                btnCustomStyle='border-2 px-2 border-blue-500 rounded-xl bg-blue-500 text-white'
+                setIsModalOpen={setIsModalOpen}
+            />
         </div>
+
     );
 };
 

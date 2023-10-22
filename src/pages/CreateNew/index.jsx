@@ -5,7 +5,9 @@ import Button from "../../components/Button";
 const CreateNew = () => {
     const { handleSubmit, register, formState, } = useForm();
 
-    const onSubmit = (data) => console.log(data)
+    const onSubmit = (data) => {
+        console.log(data)
+    }
 
     return (
         <div className="w-[80%] mx-auto h-[100vh]">
@@ -42,7 +44,7 @@ const CreateNew = () => {
                                 <textarea
                                     name="description"
                                     cols="37"
-                                    rows="5"
+                                    rows="4"
                                     className='w-[90%] mx-auto p-2 border-[1px] border-black rounded-md mt-1 bg-blue-100'
                                     {...register('description')}
                                 ></textarea>
@@ -51,38 +53,16 @@ const CreateNew = () => {
                         </div>
                         <div className="lg:w-1/2 sm:w-full ml-2">
                             <label>Task Priority</label>
-                            <div className="flex gap-4 ">
-                                <UserInput
-                                    label="Low"
-                                    name="priority"
-                                    inputType="radio"
-                                    value="low"
-                                    register={register}
-                                    formState={formState}
-                                    customInputStyle='w-[27px]'
-                                />
-                                <UserInput
-                                    label="Medium"
-                                    name="priority"
-                                    inputType="radio"
-                                    value="medium"
-                                    register={register}
-                                    formState={formState}
-                                    customInputStyle='w-[23px] ml-3'
-
-                                />
-                                <UserInput
-                                    label="High"
-                                    name="priority"
-                                    inputType="radio"
-                                    value="high"
-                                    register={register}
-                                    formState={formState}
-                                    customInputStyle='w-[23px]'
-
-                                />
-                            </div>
-
+                            <select
+                                name="task_status"
+                                className='w-[90%] mx-auto p-1 border-[1px] border-black rounded-md mt-1 bg-blue-100 mb-2'
+                                {...register('taskReminder')}
+                            >
+                                <option value="low">Low</option>
+                                <option value="high">High</option>
+                            </select><br />
+                               
+                             
                             <label>Task Reminder</label> <br />
                             <select
                                 name="task_status"
@@ -99,8 +79,8 @@ const CreateNew = () => {
                                 className='w-[90%] mx-auto p-1 border-[1px] border-black rounded-md mt-1 bg-blue-100 mb-2'
                                 {...register('taskVisibility')}
                             >
-                                <option value="true">Only Me</option>
-                                <option value="false">Team Member</option>
+                                <option value="onlyMe">Only Me</option>
+                                <option value="teamMember">Team Member</option>
                             </select><br />
 
                             <label>Task Recurring</label> <br />
@@ -109,10 +89,10 @@ const CreateNew = () => {
                                 className='w-[90%] mx-auto p-1 border-[1px] border-black rounded-md mt-1 bg-blue-100'
                                 {...register('taskRecurring')}
                             >
-                                <option value="true">Deaily</option>
-                                <option value="false">Weekly</option>
-                                <option value="false">Monthly</option>
-                                <option value="false">Yearly</option>
+                                <option value="deaily">Deaily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly">Monthly</option>
+                                <option value="yearly">Yearly</option>
                             </select>
                         </div>
                     </div>
