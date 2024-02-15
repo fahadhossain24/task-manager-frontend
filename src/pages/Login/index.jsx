@@ -36,10 +36,15 @@ const Login = () => {
                     setIsRegistrationForm(false)
                     setIsModalOpen(true);
                 } else {
-                    setSignUpError(response?.response?.data?.error)
+                    // console.log()
+                    if (response.response) {
+                        setSignUpError(response?.response?.data?.error)
+                        setIsModalOpen(true);
+                    }
+                    setSignUpError(response.message)
                     setIsModalOpen(true);
                 }
-                
+
             }
             if (isLoginForm) {
                 const { firstName, lastName, ...loginInfo } = data;
@@ -48,17 +53,17 @@ const Login = () => {
                     setLoginError('');
                     navigate('/')
                 } else {
-                    setLoginError(response?.response?.data?.error);
+                    if (response.response) {
+                        setSignUpError(response?.response?.data?.error)
+                        setIsModalOpen(true);
+                    }
+                    setSignUpError(response.message)
                     setIsModalOpen(true);
                 }
             }
 
         } catch (error) {
-            // console.log(error)
             throw new Error(error.message)
-            // console.log(error.message)
-            // setUserError(error.message)
-            // setIsModalOpen(true)
         }
     }
 

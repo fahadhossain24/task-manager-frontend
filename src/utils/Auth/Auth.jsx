@@ -22,7 +22,6 @@ export const signup = async (data) => {
 
 // login
 export const login = async (data) => {
-
     try {
         const response = await axios.post('http://localhost:4000/api/v1/auth/login', data);
         // console.log(response.data.data)
